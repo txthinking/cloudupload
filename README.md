@@ -7,7 +7,7 @@ Cloud Upload will automatically apply for ssl certificate with your domain.
 
 #### Binary
 
-Download from [releases](https://github.com/txthinking/cloudupload/releases) page.
+Download from [releases](https://github.com/txthinking/cloudupload/releases) for Linux amd64.
 
 #### Source
 
