@@ -1,12 +1,13 @@
 # Cloud Upload
 
-Upload files to multiple cloud storage in parallel.
+Upload files to multiple cloud storage in parallel.<br/>
+Cloud Upload will automatically apply for ssl certificate with your domain.
 
 ### Download
 
 #### Binary
 
-Download from (releases)[https://github.com/txthinking/cloudupload/releases] page.
+Download from [releases](https://github.com/txthinking/cloudupload/releases) page.
 
 #### Source
 
@@ -63,40 +64,26 @@ GLOBAL OPTIONS:
 
 * Method: `POST`
 * Header:
-    * `Accept`, one of:
-        * `application/json`
-        * `text/plain`
-    * `Content-Type`, one of:
-        * `application/octet-stream`
-        * `application/base64`
-        * `multipart/form-data...`, field name: `file`
-    * `X-File-Name`:
-        * Full file name with suffix, Only required when `Content-Type` is `application/octet-stream` or `application/base64`.
-* Body, one of:
-    * Binary file content when `Content-Type` is `application/octet-stream`.
-    * Base64 encoded file content when `Content-Type` is `application/octet-stream`.
-    * Multipart form data when `Content-Type` is `multipart/form-data...`.
+    * `Accept`: `application/json` or `text/plain`
+    * `Content-Type`: `application/octet-stream`, `application/base64` or `multipart/form-data...` with `file` field name
+    * `X-File-Name`: full file name with suffix, only required when `Content-Type` is `application/octet-stream` or `application/base64`
+* Body: binary file content, base64 encoded file content or multipart form data
 
 #### Response
 
 * Status Code: 200
-    * Content-Type, one of:
-        * `application/json`
-        * `text/plain; charset=utf-8`
-    * Body:
-        * File path
-        * `{ "file": "file path" }`
+    * Content-Type: `application/json` or `text/plain; charset=utf-8`
+    * Body: `{ "file": "file path" }` or `file path`
 * Status Code: !200
-    * Content-Type:
-        * `text/plain; charset=utf-8`
-    * Body:
-        * Error message
+    * Content-Type: `text/plain; charset=utf-8`
+    * Body: `error message`
 
 ### Example
 
 ```
 $ curl -H 'Content-Type: application/octet-stream' -H 'X-File-Name: Angry.png' --data-binary @Angry.png https://yourdomain.com
 vbpovzsdzbxu/Angry.png
+
 $ curl -F 'file=@Angry.png' https://yourdomain.com
 vbpovzsdzbxu/Angry.png
 ```
