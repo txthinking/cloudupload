@@ -1,6 +1,6 @@
 # Cloud Upload
 
-Upload files to multiple cloud storage in parallel. Automatically apply for ssl certificate with your domain.
+Upload files to multiple Cloud Storage in parallel. Automatically apply for ssl certificate with your domain.
 
 ### Download
 
