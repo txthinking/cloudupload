@@ -1,7 +1,6 @@
 # Cloud Upload
 
-Upload files to multiple cloud storage in parallel.<br/>
-Cloud Upload will automatically apply for ssl certificate with your domain.
+Upload files to multiple cloud storage in parallel. Automatically apply for ssl certificate with your domain.
 
 ### Download
 
@@ -65,7 +64,7 @@ GLOBAL OPTIONS:
 * Method: `POST`
 * Header:
     * `Accept`: `application/json` or `text/plain`
-    * `Content-Type`: `application/octet-stream`, `application/base64` or `multipart/form-data...` with `file` field name
+    * `Content-Type`: `application/octet-stream`, `application/base64` or `multipart/form-data...` with `file` field
     * `X-File-Name`: full file name with suffix, only required when `Content-Type` is `application/octet-stream` or `application/base64`
 * Body: binary file content, base64 encoded file content or multipart form data
 
