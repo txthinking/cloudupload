@@ -12,7 +12,7 @@ import (
 
 	"github.com/juju/ratelimit"
 	uuid "github.com/satori/go.uuid"
-	"github.com/txthinking/ant"
+	"github.com/txthinking/x"
 )
 
 type Upload struct {
@@ -107,18 +107,18 @@ func (u *Upload) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Header.Get("Accept") == "application/json" {
-		ant.JSON(w, map[string]string{
-			"file": u.URL + id + "/" + ant.URIEscape(name),
+		x.JSON(w, map[string]string{
+			"file": u.URL + id + "/" + x.URIEscape(name),
 		})
 		return
 	}
-	w.Write([]byte(u.URL + id + "/" + ant.URIEscape(name)))
+	w.Write([]byte(u.URL + id + "/" + x.URIEscape(name)))
 }
 
 func Name(r *http.Request) string {
 	name := r.Header.Get("X-File-Name")
 	if name != "" {
-		s, err := ant.URIUnescape(name)
+		s, err := x.URIUnescape(name)
 		if err != nil {
 			name = ""
 		} else {
