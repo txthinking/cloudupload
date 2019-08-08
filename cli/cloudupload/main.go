@@ -25,7 +25,7 @@ var debugListen string
 func main() {
 	app := cli.NewApp()
 	app.Name = "Cloud Upload"
-	app.Version = "20181008"
+	app.Version = "20190808"
 	app.Usage = "Upload files to multiple cloud storage in parallel"
 	app.Author = "Cloud"
 	app.Email = "cloud@txthinking.com"
