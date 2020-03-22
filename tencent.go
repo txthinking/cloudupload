@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/txthinking/x"
+	"github.com/txthinking/encrypt"
 )
 
 type Tencent struct {
@@ -32,7 +32,7 @@ func (t *Tencent) Save(name string, r io.Reader) error {
 		Timeout: 10 * time.Second,
 	}
 	ss := strings.Split(name, "/")
-	rq, err := http.NewRequest("PUT", "https://"+t.Host+"/"+ss[0]+"/"+x.URIEscape(ss[1]), bytes.NewReader(data))
+	rq, err := http.NewRequest("PUT", "https://"+t.Host+"/"+ss[0]+"/"+encrypt.URIEscape(ss[1]), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (t *Tencent) Authorization(name string, length int) (string, error) {
 	}
 	signKey := hex.EncodeToString(mac.Sum(nil))
 	httpString := fmt.Sprintf("put\n/%s\n%s\ncontent-length=%d&host=%s\n", name, "", length, t.Host)
-	stringToSign := fmt.Sprintf("sha1\n%s\n%s\n", ts, x.SHA1(httpString))
+	stringToSign := fmt.Sprintf("sha1\n%s\n%s\n", ts, encrypt.SHA1(httpString))
 	mac = hmac.New(sha1.New, []byte(signKey))
 	if _, err := mac.Write([]byte(stringToSign)); err != nil {
 		return "", err

@@ -12,6 +12,7 @@ import (
 
 	"github.com/juju/ratelimit"
 	uuid "github.com/satori/go.uuid"
+	"github.com/txthinking/encrypt"
 	"github.com/txthinking/x"
 )
 
@@ -108,17 +109,17 @@ func (u *Upload) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Header.Get("Accept") == "application/json" {
 		x.JSON(w, map[string]string{
-			"file": u.URL + id + "/" + x.URIEscape(name),
+			"file": u.URL + id + "/" + encrypt.URIEscape(name),
 		})
 		return
 	}
-	w.Write([]byte(u.URL + id + "/" + x.URIEscape(name)))
+	w.Write([]byte(u.URL + id + "/" + encrypt.URIEscape(name)))
 }
 
 func Name(r *http.Request) string {
 	name := r.Header.Get("X-File-Name")
 	if name != "" {
-		s, err := x.URIUnescape(name)
+		s, err := encrypt.URIUnescape(name)
 		if err != nil {
 			name = ""
 		} else {
