@@ -87,12 +87,7 @@ func main() {
 		&cli.StringFlag{
 			Name:  "googleServiceAccountFile",
 			Value: "",
-			Usage: "Google service account",
-		},
-		&cli.StringFlag{
-			Name:  "googleBucket",
-			Value: "",
-			Usage: "Google bucket name",
+			Usage: "Google service account file",
 		},
 		&cli.StringFlag{
 			Name:  "googleBucket",
