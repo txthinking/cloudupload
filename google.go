@@ -5,17 +5,17 @@ import (
 
 	"cloud.google.com/go/storage"
 	"golang.org/x/net/context"
+	"google.golang.org/api/option"
 )
 
 type Google struct {
-	Bucket string
+	ServiceAccountFile string
+	Bucket             string
 }
 
 func (g *Google) Save(name string, r io.Reader) error {
 	ctx := context.Background()
-	//ctx, cancel := context.WithTimeout(ctx, time.Second*60*5)
-	//defer cancel()
-	client, err := storage.NewClient(ctx)
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(g.ServiceAccountFile))
 	if err != nil {
 		return err
 	}

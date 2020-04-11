@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/codegangsta/cli"
@@ -25,99 +28,116 @@ var debugListen string
 func main() {
 	app := cli.NewApp()
 	app.Name = "Cloud Upload"
-	app.Version = "20190808"
+	app.Version = "20200411"
 	app.Usage = "Upload files to multiple cloud storage in parallel"
-	app.Author = "Cloud"
-	app.Email = "cloud@txthinking.com"
+	app.Authors = []*cli.Author{
+		{
+			Name:  "Cloud",
+			Email: "cloud@txthinking.com",
+		},
+	}
+	app.Copyright = "https://github.com/txthinking/cloudupload"
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:        "debug, d",
+		&cli.BoolFlag{
+			Name:        "debug",
+			Aliases:     []string{"d"},
 			Usage:       "Enable debug, more logs",
 			Destination: &debug,
 		},
-		cli.StringFlag{
-			Name:        "debugListen, l",
+		&cli.StringFlag{
+			Name:        "debugListen",
+			Aliases:     []string{"l"},
 			Usage:       "Listen address for debug",
 			Value:       "127.0.0.1:6060",
 			Destination: &debugListen,
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "listen",
 			Usage: "Listen address",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "domain",
 			Usage: "If domain is specified, 80 and 443 ports will be used. Listen address is no longer needed",
 		},
-		cli.Int64Flag{
+		&cli.Int64Flag{
 			Name:  "maxBodySize",
 			Usage: "Max size of http body, M",
 		},
-		cli.Int64Flag{
+		&cli.Int64Flag{
 			Name:  "timeout",
 			Usage: "Read timeout, write timeout x2, idle timeout x20, s",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "origin",
-			Usage: "Allow origins for CORS, can repeat more times. like https://google.com, suggest add https://google.com/ too",
+			Usage: "Allow origins for CORS, can repeat more times. like https://google.com",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "enableLocal",
 			Usage: "Enable local store",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "localStorage",
 			Value: "",
 			Usage: "Local directory path",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "enableGoogle",
-			Usage: "Enable google store, first needs $ gcloud auth application-default login",
+			Usage: "Enable google store",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
+			Name:  "googleServiceAccountFile",
+			Value: "",
+			Usage: "Google service account",
+		},
+		&cli.StringFlag{
 			Name:  "googleBucket",
 			Value: "",
 			Usage: "Google bucket name",
 		},
-		cli.BoolFlag{
+		&cli.StringFlag{
+			Name:  "googleBucket",
+			Value: "",
+			Usage: "Google bucket name",
+		},
+		&cli.BoolFlag{
 			Name:  "enableAliyun",
 			Usage: "Enable aliyun OSS",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "aliyunAccessKeyID",
 			Value: "",
 			Usage: "Aliyun access key id",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "aliyunAccessKeySecret",
 			Value: "",
 			Usage: "Aliyun access key secret",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "aliyunEndpoint",
 			Value: "",
 			Usage: "Aliyun endpoint, like: https://oss-cn-shanghai.aliyuncs.com",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "aliyunBucket",
 			Value: "",
 			Usage: "Aliyun bucket name",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "enableTencent",
 			Usage: "Enable Tencent",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "tencentSecretId",
 			Value: "",
 			Usage: "Tencent secret id",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "tencentSecretKey",
 			Value: "",
 			Usage: "Tencent secret key",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "tencentHost",
 			Value: "",
 			Usage: "domain",
@@ -133,7 +153,8 @@ func main() {
 		}
 		if c.Bool("enableGoogle") {
 			google := &cloudupload.Google{
-				Bucket: c.String("googleBucket"),
+				ServiceAccountFile: c.String("googleServiceAccountFile"),
+				Bucket:             c.String("googleBucket"),
 			}
 			ss = append(ss, google)
 		}
@@ -256,7 +277,13 @@ func runHTTPServer(address, domain string, origins []string, stores []clouduploa
 			MaxHeaderBytes: 1 << 20,
 			Handler:        n,
 		}
-		return s.ListenAndServe()
+		go func() {
+			log.Println(s.ListenAndServe())
+		}()
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		<-sigs
+		return s.Shutdown(context.Background())
 	}
 	m := autocert.Manager{
 		Cache:      autocert.DirCache(".letsencrypt"),
@@ -274,5 +301,11 @@ func runHTTPServer(address, domain string, origins []string, stores []clouduploa
 		Handler:        n,
 		TLSConfig:      &tls.Config{GetCertificate: m.GetCertificate},
 	}
-	return ss.ListenAndServeTLS("", "")
+	go func() {
+		log.Println(ss.ListenAndServeTLS("", ""))
+	}()
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	return ss.Shutdown(context.Background())
 }

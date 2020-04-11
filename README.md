@@ -2,17 +2,15 @@
 
 Upload files to multiple Cloud Storage in parallel. Automatically apply for ssl certificate with your domain.
 
-### Download
+### Install via [nami](https://github.com/txthinking/nami)
 
-#### Binary
+```
+$ nami install github.com/txthinking/cloudupload
+```
 
-Download from [releases](https://github.com/txthinking/cloudupload/releases) for Linux amd64.
+or download from [releases](https://github.com/txthinking/cloudupload/releases) or `go get github.com/txthinking/cloudupload/cli/cloudupload` or embed lib `go get github.com/txthinking/cloudupload`
 
-#### Source
-
-    $ go get github.com/txthinking/cloudupload/cli/cloudupload
-
-### Run
+### Usage
 
     NAME:
        Cloud Upload - Upload files to multiple cloud storage in parallel
