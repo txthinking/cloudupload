@@ -84,3 +84,11 @@ COPYRIGHT:
 
     $ curl -F 'file=@Angry.png' https://yourdomain.com
     vbpovzsdzbxu/Angry.png
+
+## Author
+
+A project by [txthinking](https://www.txthinking.com)
+
+## License
+
+Licensed under The MIT License
